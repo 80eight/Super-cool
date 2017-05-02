@@ -35,6 +35,8 @@ public class RifleController : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+
         timeBetween += Time.deltaTime;
         if (Input.GetAxisRaw("Fire1") == 1&& timeBetween > fireRate&&currentAmmo > 0)
         {
@@ -51,7 +53,9 @@ public class RifleController : MonoBehaviour {
     void Shoot()
     {
         currentAmmo -= 1;
-        Instantiate(bullet, transform.position, transform.rotation).GetComponent<Rigidbody>().AddForce(hand.forward* force,ForceMode.VelocityChange);
+        cloneBullet = Instantiate(bullet, transform.position, transform.rotation);
+        cloneBullet.GetComponent<Rigidbody>().AddForce(hand.forward * force, ForceMode.VelocityChange);
+        cloneBullet.tag = "ThrowableA";
         timeBetween = 0;
     }
 }

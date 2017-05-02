@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class EnemyShooting : MonoBehaviour {
 
     private float ammo;
-    private float currentAmmo;
+    public float currentAmmo;
     private float timeBetween;
     private float fireRate;
     private float force;
@@ -15,9 +15,14 @@ public class EnemyShooting : MonoBehaviour {
     public GameObject bullet;
     public GameObject player;
     public GameObject gun;
+    public PunchController punchC;
+    public Transform hand;
+
 	// Use this for initialization
 	void Start () {
-
+        punchC = GameObject.FindGameObjectWithTag("Hand").GetComponent<PunchController>();
+        punchC.enabled = false;
+        hand = transform.FindChild("Hand");
         player = GameObject.FindGameObjectWithTag("Player");
         ammo = 5;
         currentAmmo = ammo;
@@ -28,6 +33,7 @@ public class EnemyShooting : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         #region Updates
+        gun.transform.position = hand.position;
         gun.transform.SetParent(GetComponent<EnemyController>().hand);
         gun.transform.localEulerAngles = Vector3.zero; 
         timeBetween += Time.deltaTime;

@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour {
     GameObject Player;
     public Camera mainCam;
 
+    public float health;
     float moveSpeed;
     float jumpSpeed;
     float reachRange;
@@ -40,6 +41,7 @@ public class PlayerController : MonoBehaviour {
             }
         }*/
         //delete this bit when uncommenting class
+        health = 2;
         reachRange = 5;
         moveSpeed = 5;
         jumpSpeed = 5;
@@ -48,12 +50,17 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        #region Updates
         if (pickingUp)
         {
             objectHolding.transform.position = Vector3.MoveTowards(objectHolding.transform.position, hand.position, moveSpeed);
         }
-
+        if(health <= 0)
+        {
+            Die();
+        }
         transform.eulerAngles = new Vector3(0f, mainCam.transform.eulerAngles.y, 0);
+        #endregion
         #region movement
         if (Input.GetKey(KeyCode.D))
         {
@@ -116,7 +123,7 @@ public class PlayerController : MonoBehaviour {
         {
             grounded = true;
         }
-        if(col.transform.CompareTag("Throwable"))
+        else if(col.transform.CompareTag("ThrowableA"))
         {
             Destroy(gameObject);
         }
@@ -164,5 +171,10 @@ public class PlayerController : MonoBehaviour {
         Time.timeScale = 0.2f;
         hasThrowable = false;
         Object.AddComponent<ThrowableController>();
+    }
+
+    private void Die()
+    {
+        Destroy(gameObject);
     }
 }

@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour {
 
+
+    PlayerController pc;
     NavMeshAgent nav;
     public Transform hand;
     GameObject player;
@@ -12,6 +14,8 @@ public class EnemyController : MonoBehaviour {
     GameObject objectHolding;
     Vector3 closestPos;
     EnemyShooting shooting;
+    PunchController PunchC;
+    EnemyDetector ed;
 
     private float range;
     private float speed;
@@ -25,12 +29,14 @@ public class EnemyController : MonoBehaviour {
         hasThrowable = false;
         pickingUp = false;
         player = GameObject.FindGameObjectWithTag("Player");
+        pc = player.GetComponent<PlayerController>();
         nav = GetComponent<NavMeshAgent>();
         shooting = GetComponent<EnemyShooting>();
+        ed = GameObject.Find("EnemyDetector").GetComponent<EnemyDetector>();
 
         strength = 5;
         range = 20;
-        speed = 3;
+        speed = 2.5f;
         nav.speed = speed; 
 	}
 	
@@ -50,6 +56,10 @@ public class EnemyController : MonoBehaviour {
                 }
             }
         }
+        else if(shooting.enabled == true && shooting.currentAmmo > 0)
+        {
+            Throw(objectHolding);
+        }
 
         #endregion
         #region Selecting Obj
@@ -59,14 +69,12 @@ public class EnemyController : MonoBehaviour {
             closestPos = pickups[0].transform.position;
             for(int i =0; i < pickups.Length; i++)
             {
-                if(Vector3.Distance(pickups[i].transform.position,transform.position) < Vector3.Distance(closestPos, transform.position))
-                {
-                    closestPos = pickups[i].transform.position;
-                    closestPos = new Vector3(closestPos.x, 1, closestPos.z);
-                    transform.LookAt(pickups[i].transform.position);
-                    transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
-                    nav.SetDestination(closestPos);
-                }
+            
+                        closestPos = pickups[i].transform.position;
+                        closestPos = new Vector3(closestPos.x, 1, closestPos.z);
+                        transform.LookAt(pickups[i].transform.position);
+                        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+                        nav.SetDestination(closestPos);
             } 
         }
         else if(GameObject.FindGameObjectWithTag("Throwable") != null && !hasThrowable)
@@ -102,13 +110,14 @@ public class EnemyController : MonoBehaviour {
         }
         nav.SetDestination(closestPos);
         #endregion
-
+        #region Other
         if (pickingUp)
         {
             hasThrowable = true;
             objectHolding.transform.SetParent(transform);
             objectHolding.transform.position = hand.transform.position;
         }
+        #endregion
     }
 
     void OnTriggerEnter(Collider col)
@@ -148,4 +157,10 @@ public class EnemyController : MonoBehaviour {
         Object.GetComponent<Rigidbody>().AddForce(force, ForceMode.Impulse);
         hasThrowable = false;
     }
+
+    void OnDestroy()
+    {
+        ed.enemiesAlive -= 1;
+    }
+
 }

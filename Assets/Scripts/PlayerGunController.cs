@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerGunController : MonoBehaviour {
 
     Camera fireCam;
+
+    public Text OutOfAmmoText;
 
     public float ammo;
     public float currentAmmo;
@@ -13,8 +16,11 @@ public class PlayerGunController : MonoBehaviour {
     private bool canThrow;
     public GameObject bullet;
     public PlayerController playerController;
+
 	// Use this for initialization
 	void Start () {
+        OutOfAmmoText = FindObjectOfType<Text>();
+        OutOfAmmoText.enabled = false;
         tag = "GunA";
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         canThrow = true;
@@ -27,20 +33,25 @@ public class PlayerGunController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
         timeBetween += Time.deltaTime;
         if(Input.GetAxisRaw("Fire1") == 1 && timeBetween > fireRate)
         {
             if(currentAmmo > 0)
             {
-            Shoot();
+                Shoot();
             }
             else
             {
-                //display out of ammo text
+                OutOfAmmoText.enabled = true;
             }
         }
-        if(Input.GetAxisRaw("Fire2") == 1&&canThrow)
+        else
+        {
+            OutOfAmmoText.enabled = false;
+        }
+
+        if (Input.GetAxisRaw("Fire2") == 1&&canThrow)
         {
             gameObject.tag = "Damagable";
             playerController.Throwing(gameObject);
